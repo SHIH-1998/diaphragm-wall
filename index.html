@@ -621,15 +621,8 @@ html_v7_content = """<!DOCTYPE html>
     });
 
     function saveData() {
-      const firebaseConfig = {
-  apiKey: "AIzaSyCv66pE4zBxas4QySrmeVyXXXhqbYg1llI",
-  authDomain: "diaphragm-wall-61033.firebaseapp.com",
-  projectId: "diaphragm-wall-61033",
-  storageBucket: "diaphragm-wall-61033.firebasestorage.app",
-  messagingSenderId: "245135889935",
-  appId: "1:245135889935:web:b590ed96b8ba879115b57a",
-  measurementId: "G-4LTNHYDWTG"
-};
+      const data = { state, perimeterSegments, constructionCards };
+      localStorage.setItem('cadSystemData_v7', JSON.stringify(data));
       alert("✅ 佈局與工程參數進度已成功儲存！");
     }
 
