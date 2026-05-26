@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>連續壁工程-公母單元</title>
+  <style>
+    :root {
+      --bg-color: #080b0d;
+      --panel-bg: #111619;
+      --panel-border: #232d35;
+      --cyan-accent: #00e5ff;
+      --cyan-dim: rgba(0, 229, 255, 0.15);
+      --red-column: #ff5252;
+      --dim-line: #78909c;
+      --text-main: #e0e6ed;
+      --text-muted: #607d8b;
+      --success: #4caf50;
+      --success-dark: #2e7d32;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* 頂部功能列 */
+    header {
+      background-color: var(--panel-bg);
+      border-bottom: 1px solid var(--panel-border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, #00e5ff, #00838f);
+      width: 12px;
+      height: 24px;
+      border-radius: 2px;
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action {
+      background-color: #1c262c;
+      color: var(--cyan-accent);
+      border: 1px solid var(--cyan-accent);
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background-color: var(--cyan-accent);
+      color: #000;
+    }
+
+    /* 主要工作空間 */
+    .workspace {
+      display: flex;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 左側主圖面 */
+    .canvas-container {
+      flex: 1;
+      background-color: #0a0d10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .canvas-wrapper {
+      width: 100%;
+      max-width: 1400px;
+      aspect-ratio: 1660 / 1000;
+      position: relative;
+      background-color: #0d1215;
+      border: 1px solid var(--panel-border);
+      box-shadow: inset 0 0 60px rgba(0,0,0,0.4);
+      border-radius: 4px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* 右側主控制面板 */
+    .control-panel {
+      width: 360px;
+      background-color: var(--panel-bg);
+      border-left: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.2);
+    }
+
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--panel-border);
+      background-color: #0d1214;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      color: var(--cyan-accent);
+      background-color: var(--panel-bg);
+      border-bottom: 2px solid var(--cyan-accent);
+    }
+
+    .panel-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cyan-accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 增減數量控制器 */
+    .counter-card {
+      background-color: #161d21;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .counter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .counter-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .counter-control {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background-color: #0b0f11;
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      padding: 2px;
+    }
+
+    .btn-qty {
+      width: 28px;
+      height: 28px;
+      background-color: #1c262c;
+      border: none;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-qty:hover {
+      background-color: #27353d;
+      color: var(--cyan-accent);
+    }
+
+    .qty-display {
+      width: 40px;
+      text-align: center;
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffb300;
+    }
+
+    /* 數據分析檢視盒 */
+    .inspector-box {
+      background-color: #0b0f11;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 12px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #192226;
+    }
+    .data-row:last-child { border-bottom: none; }
+    .data-id { color: var(--text-muted); font-family: monospace; }
+    .data-value { color: #ffcc00; font-family: monospace; font-weight: bold; }
+
+    /* SVG 圖元樣式 */
+    .perimeter-block {
+      stroke: var(--cyan-accent);
+      stroke-width: 0.8px;
+      transition: fill 0.15s ease;
+      cursor: pointer;
+    }
+    .perimeter-block:hover { fill: rgba(0, 229, 255, 0.35) !important; }
+    .perimeter-block.active-card {
+      fill: rgba(0, 229, 255, 0.25) !important;
+      stroke-width: 1.5px;
+    }
+    .perimeter-block.completed-card {
+      fill: rgba(76, 175, 80, 0.35) !important;
+      stroke: var(--success);
+    }
+
+    .draggable-column {
+      fill: var(--red-column);
+      stroke: #ffffff;
+      stroke-width: 0.5px;
+      cursor: move;
+      filter: drop-shadow(0px 3px 5px rgba(0,0,0,0.6));
+    }
+    .draggable-column:hover { stroke-width: 1.5px; fill: #ff7373; }
+    .draggable-column.dragging { fill: #ff8a80; stroke-width: 2px; stroke: var(--cyan-accent); }
+
+    .dim-line { stroke: var(--dim-line); stroke-dasharray: 2 2; stroke-width: 1px; }
+    .dim-text-bg {
+      fill: #1a2327; stroke: var(--dim-line); stroke-width: 0.5px; cursor: pointer; rx: 3; ry: 3;
+    }
+    .dim-text-bg:hover { stroke: var(--cyan-accent); fill: #213138; }
+    .dim-text {
+      font-family: 'Courier New', monospace; font-size: 11px; fill: #ffcc00;
+      font-weight: bold; text-anchor: middle; dominant-baseline: central;
+      cursor: pointer; user-select: none;
+    }
+
+    /* 引線 (Leader Lines) */
+    .leader-line {
+      stroke: var(--cyan-accent); stroke-width: 1.2px; stroke-dasharray: 4 3;
+      fill: none; pointer-events: none; opacity: 0.7;
+    }
+    .leader-joint { fill: var(--cyan-accent); pointer-events: none; }
+
+    .leader-line.completed-line { stroke: var(--success); }
+    .leader-joint.completed-joint { fill: var(--success); }
+
+    /* ============================================================
+       HTML 內嵌施工表格圖框
+       ============================================================ */
+    .engineering-card {
+      background: rgba(14, 20, 23, 0.92);
+      border: 1px solid var(--cyan-accent);
+      border-radius: 4px;
+      width: 180px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      color: #ffffff;
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .engineering-card.completed {
+      border-color: var(--success);
+      background: rgba(14, 30, 18, 0.92);
+    }
+
+    .card-titlebar {
+      background: #007682;
+      color: #ffffff;
+      padding: 4px 8px;
+      font-size: 10.5px; 
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+      user-select: none;
+      letter-spacing: 0.5px;
+    }
+
+    .engineering-card.completed .card-titlebar {
+      background: var(--success-dark);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      cursor: pointer; opacity: 0.8; font-size: 11px; transition: opacity 0.2s; user-select: none;
+    }
+    .icon-btn:hover { opacity: 1; }
+    .icon-del { color: #ff8a80; font-weight: bold; }
+    .icon-del:hover { color: #ff5252; }
+
+    .card-grid {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+      flex: 1;
+    }
+
+    .card-grid td {
+      padding: 3px 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      vertical-align: middle;
+    }
+    .card-grid tr:last-child td { border-bottom: none; }
+
+    .field-label {
+      color: #8896a3;
+      width: 55px;
+      font-size: 9.5px; 
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .engineering-card.completed .field-label {
+      color: #a5d6a7;
+    }
+
+    .field-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid transparent;
+      border-radius: 2px;
+      color: #ffcc00;
+      font-size: 10px; 
+      padding: 3px 5px;
+      font-family: monospace;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .field-input:focus {
+      border-color: rgba(0, 229, 255, 0.5);
+      background: rgba(0, 0, 0, 0.8);
+      color: #ffffff;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1); opacity: 0.5; cursor: pointer;
+    }
+
+    .btn-complete-toggle {
+      width: 100%;
+      background: #1c262c;
+      color: var(--text-main);
+      border: none;
+      padding: 6px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: auto; /* 確保按鈕貼底 */
+    }
+    .btn-complete-toggle:hover { background: #27353d; }
+    
+    .engineering-card.completed .btn-complete-toggle {
+      background: var(--success);
+      color: #000;
+    }
+    .engineering-card.completed .btn-complete-toggle:hover {
+      background: #66bb6a;
+    }
+
+    /* 收合狀態的方形圖標 (Collapsed Icon) */
+    .collapsed-icon {
+      width: 36px;
+      height: 36px;
+      background: #007682;
+      border: 2px solid var(--cyan-accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: move;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      font-size: 16px;
+      user-select: none;
+      transition: all 0.2s;
+    }
+    
+    .collapsed-icon:hover {
+      background: var(--cyan-accent);
+      transform: scale(1.1);
+    }
+
+    .collapsed-icon.completed {
+      background: var(--success-dark);
+      border-color: var(--success);
+    }
+    .collapsed-icon.completed:hover {
+      background: var(--success);
+    }
+
+    /* 列印與 PDF 匯出專用樣式 */
+    @media print {
+      header, .control-panel, .modal-overlay { display: none !important; }
+      body, .workspace, .canvas-container { 
+        background: #0d1215 !important;
+        padding: 0 !important; margin: 0 !important; 
+        display: block !important;
+      }
+      .canvas-wrapper { 
+        border: none !important; box-shadow: none !important; 
+        width: 100vw !important; height: 100vh !important; max-width: none !important; 
+      }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+
+    /* 數值輸入彈窗 */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(4, 7, 9, 0.85); display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 1000;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-card {
+      background-color: #161d21; border: 1px solid var(--cyan-accent); border-radius: 8px;
+      width: 340px; transform: scale(0.95); transition: transform 0.2s;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .modal-overlay.active .modal-card { transform: scale(1); }
+    .modal-header { background-color: #1d262c; padding: 14px 18px; font-size: 14px; font-weight: bold; color: var(--cyan-accent); border-bottom: 1px solid var(--panel-border); }
+    .modal-body { padding: 22px 18px; }
+    .modal-body label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .modal-body input { width: 100%; background-color: #0b0f11; border: 1px solid #37474f; border-radius: 4px; padding: 12px; color: #ffffff; font-size: 16px; outline: none; font-family: monospace; }
+    .modal-footer { background-color: #1d262c; padding: 12px 18px; display: flex; justify-content: flex-end; gap: 10px; }
+    .btn { padding: 10px 18px; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; font-weight: 600; }
+    .btn-cancel { background-color: #37474f; color: var(--text-main); }
+    .btn-submit { background-color: var(--cyan-accent); color: #0b0f11; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-section">
+      <div class="logo-badge"></div>
+      <h1>CAD 參數化結構佈局與工進看板系統 (V7 修正優化版)</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-action" onclick="saveData()">💾 儲存進度</button>
+      <button class="btn-action" onclick="exportPDF()">📄 匯出 PDF</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <div class="canvas-container">
+      <div class="canvas-wrapper">
+        <svg id="cadSvg" viewBox="0 0 1660 1000">
+          <defs>
+            <pattern id="cyan-hatch" width="12" height="12" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="0" x2="0" y2="12" stroke="#00e5ff" stroke-width="1.5" opacity="0.6"/>
+            </pattern>
+          </defs>
+
+          <rect width="1660" height="1000" fill="#0d1215" />
+
+          <g stroke="#ffffff" stroke-width="0.5" opacity="0.05" stroke-dasharray="10 10" pointer-events="none">
+            <line x1="830" y1="0" x2="830" y2="1000" />
+            <line x1="0" y1="500" x2="1660" y2="500" />
+          </g>
+
+          <g id="perimeterContainer"></g>          
+          <g id="dynamicContainer"></g>            
+          <g id="leaderLinesContainer"></g>        
+          <g id="floatingCardsContainer"></g>      
+        </svg>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <div class="panel-tabs">
+        <button class="tab-btn active" id="tabColumns" onclick="switchTab('columns')">🟥 內圈柱體調配</button>
+        <button class="tab-btn" id="tabPerimeter" onclick="switchTab('perimeter')">🟩 青色外框與看板</button>
+      </div>
+
+      <div class="panel-content">
+        <div id="contentColumns" style="display: flex; flex-direction: column; gap: 15px;">
+          <div class="section-title">■ 調整各牆面柱體配置數量</div>
+          <div class="counter-card"><div class="counter-header"><div class="counter-title">頂部牆面柱體 (TOP)</div><div class="counter-control"><button class="btn-qty" onclick="changeColumnQty('top', -1)">-</button><div class="qty-display" id="lbl-qty-top">5</div><button class="btn-qty" onclick="changeColumnQty('top', 1)">+</button></div></div></div>
+          <div class="counter-card"><div class="counter-header"><div class="counter-title">底部牆面柱體 (BOTTOM)</div><div class="counter-control"><button class="btn-qty" onclick="changeColumnQty('bottom', -1)">-</button><div class="qty-display" id="lbl-qty-bottom">5</div><button class="btn-qty" onclick="changeColumnQty('bottom', 1)">+</button></div></div></div>
+          <div class="counter-card"><div class="counter-header"><div class="counter-title">左側牆面柱體 (LEFT)</div><div class="counter-control"><button class="btn-qty" onclick="changeColumnQty('left', -1)">-</button><div class="qty-display" id="lbl-qty-left">4</div><button class="btn-qty" onclick="changeColumnQty('left', 1)">+</button></div></div></div>
+          <div class="counter-card"><div class="counter-header"><div class="counter-title">右側牆面柱體 (RIGHT)</div><div class="counter-control"><button class="btn-qty" onclick="changeColumnQty('right', -1)">-</button><div class="qty-display" id="lbl-qty-right">4</div><button class="btn-qty" onclick="changeColumnQty('right', 1)">+</button></div></div></div>
+          <div class="section-title" style="margin-top: 5px;">■ 即時柱體間距數據清單</div>
+          <div class="inspector-box" id="columnInspector"></div>
+        </div>
+
+        <div id="contentPerimeter" style="display: none; flex-direction: column; gap: 15px;">
+          <div class="section-title">■ 調整各邊外框青色區塊分割數</div>
+          <div class="counter-card"><div class="counter-header"><div class="counter-title">頂部外框區塊數 (TOP)</div><div class="counter-control"><button class="btn-qty" onclick="changePerimeterQty('top', -1)">-</button><div class="qty-display" id="lbl-perim-top">12</div><button class="btn-qty" onclick="changePerimeterQty('top', 1)">+</button></div></div></div>
+          <div class="counter-card"><div class="counter-header"><div class="counter-title">底部外框區塊數 (BOTTOM)</div><div class="counter-control"><button class="btn-qty" onclick="changePerimeterQty('bottom', -1)">-</button><div class="qty-display" id="lbl-perim-bottom">12</div><button class="btn-qty" onclick="changePerimeterQty('bottom', 1)">+</button></div></div></div>
+          <div class="counter-card"><div class="counter-header"><div class="counter-title">左側外框區塊數 (LEFT)</div><div class="counter-control"><button class="btn-qty" onclick="changePerimeterQty('left', -1)">-</button><div class="qty-display" id="lbl-perim-left">7</div><button class="btn-qty" onclick="changePerimeterQty('left', 1)">+</button></div></div></div>
+          <div class="counter-card"><div class="counter-header"><div class="counter-title">右側外框區塊數 (RIGHT)</div><div class="counter-control"><button class="btn-qty" onclick="changePerimeterQty('right', -1)">-</button><div class="qty-display" id="lbl-perim-right">7</div><button class="btn-qty" onclick="changePerimeterQty('right', 1)">+</button></div></div></div>
+          <div class="section-title" style="margin-top: 5px;">■ 已啟用施工圖框數據一覽</div>
+          <div class="inspector-box" id="perimeterInspector"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="inputModal">
+    <div class="modal-card">
+      <div class="modal-header" id="modalTitle">變更參數數值</div>
+      <div class="modal-body">
+        <label id="modalLabel" for="paramInput">請輸入新的數值 (M)：</label>
+        <input type="number" id="paramInput" step="any">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+        <button class="btn btn-submit" onclick="submitValue()">套用修改</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 💡 成功將您提供的真實 Firebase 設定值加進去了
+    const firebaseConfig = {
+      apiKey: "AIzaSyBvyCx9-15LbN_CTwgotzpDfgB69QQ5KAg",
+      authDomain: "my-cad-project-a187a.firebaseapp.com",
+      databaseURL: "https://my-cad-project-a187a-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "my-cad-project-a187a",
+      storageBucket: "my-cad-project-a187a.firebasestorage.app",
+      messagingSenderId: "960155222016",
+      appId: "1:960155222016:web:0460c794d1193d045558e5",
+      measurementId: "G-01BWX1C6NE"
+    };
+
+    const CONFIG = {
+      canvasW: 1660,
+      canvasH: 1000,
+      marginX: 280, 
+      marginY: 200, 
+      cadW: 1100,   
+      cadH: 600,    
+      thickness: 20,
+      innerOffset: 20, 
+      colSize: 16,
+      cardW: 180,   
+      cardH: 215  // ★ 修正點 1: 增加卡片高度，避免底部按鈕被裁切  
+    };
+
+    let state = {
+      topCols: [400, 600, 800, 1000, 1200],
+      bottomCols: [400, 600, 800, 1000, 1200],
+      leftCols: [300, 450, 600, 750],
+      rightCols: [300, 450, 600, 750]
+    };
+
+    let perimeterSegments = { top: 12, bottom: 12, left: 7, right: 7 };
+    let constructionCards = {};
+    let currentModalTask = null, dragInfo = null, cardDragInfo = null;
+    let isDraggingCard = false; // ★ 修正點 2: 用來辨識目前是拖曳還是點擊
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadData(); 
+      rebuildPerimeterUI();
+      renderDynamicElements();
+      renderAllConstructionCards();
+      updateAllInspectors();
+      setupGlobalEvents();
+    });
+
+    function saveData() {
+      const data = { state, perimeterSegments, constructionCards };
+      localStorage.setItem('cadSystemData_v7', JSON.stringify(data));
+      alert("✅ 佈局與工程參數進度已成功儲存！");
+    }
+
+    function loadData() {
+      const data = localStorage.getItem('cadSystemData_v7') || localStorage.getItem('cadSystemData_v6');
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          state = parsed.state || state;
+          perimeterSegments = parsed.perimeterSegments || perimeterSegments;
+          constructionCards = parsed.constructionCards || {};
+          
+          document.getElementById('lbl-qty-top').textContent = state.topCols.length;
+          document.getElementById('lbl-qty-bottom').textContent = state.bottomCols.length;
+          document.getElementById('lbl-qty-left').textContent = state.leftCols.length;
+          document.getElementById('lbl-qty-right').textContent = state.rightCols.length;
+          
+          document.getElementById('lbl-perim-top').textContent = perimeterSegments.top;
+          document.getElementById('lbl-perim-bottom').textContent = perimeterSegments.bottom;
+          document.getElementById('lbl-perim-left').textContent = perimeterSegments.left;
+          document.getElementById('lbl-perim-right').textContent = perimeterSegments.right;
+        } catch(e) {
+          initDefaultConstructionData();
+        }
+      } else {
+        initDefaultConstructionData();
+      }
+    }
+
+    function exportPDF() { window.print(); }
+
+    function initDefaultConstructionData() {
+      constructionCards["PERIM-TOP-2"] = {
+        name: "第一工區-頂2", time: "2026-06-01", compTime: "2026-06-15", estVol: "45", actVol: "42", rebar: "+0.8M", 
+        x: 450, y: 30, cx: 0, cy: 0, isCollapsed: false, isCompleted: false
+      };
+      constructionCards["PERIM-LEFT-3"] = {
+        name: "第二工區-左3", time: "2026-06-03", compTime: "2026-06-18", estVol: "32", actVol: "32", rebar: "-0.4M", 
+        x: 50, y: 400, cx: 0, cy: 0, isCollapsed: false, isCompleted: true
+      };
+    }
+
+    function switchTab(tab) {
+      document.getElementById('tabColumns').classList.toggle('active', tab === 'columns');
+      document.getElementById('tabPerimeter').classList.toggle('active', tab === 'perimeter');
+      document.getElementById('contentColumns').style.display = tab === 'columns' ? 'flex' : 'none';
+      document.getElementById('contentPerimeter').style.display = tab === 'perimeter' ? 'flex' : 'none';
+    }
+
+    function changePerimeterQty(wall, delta) {
+      let next = perimeterSegments[wall] + delta;
+      if (next < 1) next = 1; if (next > 40) next = 40;
+      perimeterSegments[wall] = next;
+      document.getElementById(`lbl-perim-${wall}`).textContent = next;
+      rebuildPerimeterUI(); renderAllConstructionCards(); updateAllInspectors();
+    }
+
+    function rebuildPerimeterUI() {
+      const container = document.getElementById("perimeterContainer");
+      let html = "";
+      
+      const xStart = CONFIG.marginX, totalWidth = CONFIG.cadW;
+      const yStart = CONFIG.marginY, totalHeight = CONFIG.cadH;
+      const topY = CONFIG.marginY, bottomY = yStart + totalHeight - CONFIG.thickness;
+      const leftX = CONFIG.marginX, rightX = xStart + totalWidth - CONFIG.thickness;
+
+      function getBlockHtml(x, y, w, h, id, fill, isH) {
+        let activeClass = "";
+        if (constructionCards[id]) activeClass = constructionCards[id].isCompleted ? "completed-card" : "active-card";
+        let cx = isH ? x + w/2 : x + CONFIG.thickness/2;
+        let cy = isH ? y + CONFIG.thickness/2 : y + h/2;
+        return `<rect class="perimeter-block ${activeClass}" id="${id}" data-id="${id}" data-cx="${cx}" data-cy="${cy}" x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" />`;
+      }
+
+      let countTop = perimeterSegments.top, wTop = totalWidth / countTop;
+      for (let i = 0; i < countTop; i++) html += getBlockHtml(xStart + i * wTop, topY, wTop, CONFIG.thickness, `PERIM-TOP-${i}`, (i % 2 === 0) ? "url(#cyan-hatch)" : "transparent", true);
+      
+      let countBottom = perimeterSegments.bottom, wBottom = totalWidth / countBottom;
+      for (let i = 0; i < countBottom; i++) html += getBlockHtml(xStart + i * wBottom, bottomY, wBottom, CONFIG.thickness, `PERIM-BOTTOM-${i}`, (i % 2 === 0) ? "url(#cyan-hatch)" : "transparent", true);
+      
+      let countLeft = perimeterSegments.left, hLeft = (totalHeight - 2 * CONFIG.thickness) / countLeft;
+      for (let i = 0; i < countLeft; i++) html += getBlockHtml(leftX, yStart + CONFIG.thickness + i * hLeft, CONFIG.thickness, hLeft, `PERIM-LEFT-${i}`, (i % 2 === 0) ? "url(#cyan-hatch)" : "transparent", false);
+      
+      let countRight = perimeterSegments.right, hRight = (totalHeight - 2 * CONFIG.thickness) / countRight;
+      for (let i = 0; i < countRight; i++) html += getBlockHtml(rightX, yStart + CONFIG.thickness + i * hRight, CONFIG.thickness, hRight, `PERIM-RIGHT-${i}`, (i % 2 === 0) ? "url(#cyan-hatch)" : "transparent", false);
+
+      container.innerHTML = html;
+      container.querySelectorAll('.perimeter-block').forEach(block => {
+        block.addEventListener('click', (e) => toggleConstructionCard(e.target.getAttribute('data-id'), parseFloat(e.target.getAttribute('data-cx')), parseFloat(e.target.getAttribute('data-cy'))));
+      });
+    }
+
+    function toggleConstructionCard(id, cx, cy) {
+      if (constructionCards[id]) {
+        constructionCards[id].isCollapsed = false;
+        renderAllConstructionCards();
+        const cardEl = document.getElementById(`card-fo-${id}`);
+        if (cardEl) { cardEl.style.filter = "drop-shadow(0 0 12px #00e5ff)"; setTimeout(() => cardEl.style.filter = "none", 800); }
+      } else {
+        let wallName = id.split('-')[1], blockIndex = id.split('-')[2];
+        let initialX, initialY;
+
+        if (wallName === 'TOP') { initialX = cx - CONFIG.cardW / 2; initialY = cy - 40 - CONFIG.cardH; } 
+        else if (wallName === 'BOTTOM') { initialX = cx - CONFIG.cardW / 2; initialY = cy + 40; } 
+        else if (wallName === 'LEFT') { initialX = cx - 40 - CONFIG.cardW; initialY = cy - CONFIG.cardH / 2; } 
+        else { initialX = cx + 40; initialY = cy - CONFIG.cardH / 2; }
+        
+        if (initialX + CONFIG.cardW > CONFIG.canvasW) initialX = CONFIG.canvasW - CONFIG.cardW - 10;
+        if (initialX < 10) initialX = 10;
+        if (initialY + CONFIG.cardH > CONFIG.canvasH) initialY = CONFIG.canvasH - CONFIG.cardH - 10;
+        if (initialY < 10) initialY = 10;
+
+        constructionCards[id] = {
+          name: `區域-${wallName}${parseInt(blockIndex)+1}`, time: new Date().toISOString().split('T')[0], compTime: "",
+          estVol: "40", actVol: "0", rebar: "±0.0M", x: initialX, y: initialY, cx: cx, cy: cy, isCollapsed: false, isCompleted: false
+        };
+      }
+      rebuildPerimeterUI(); renderAllConstructionCards(); updateAllInspectors();
+    }
+
+    window.toggleCollapseCard = function(id) {
+      if(isDraggingCard) return; 
+      if(constructionCards[id]) {
+        constructionCards[id].isCollapsed = !constructionCards[id].isCollapsed;
+        renderAllConstructionCards();
+      }
+    };
+
+    window.toggleCompleteStatus = function(id) {
+      if(constructionCards[id]) {
+        constructionCards[id].isCompleted = !constructionCards[id].isCompleted;
+        rebuildPerimeterUI(); renderAllConstructionCards(); updateAllInspectors();
+      }
+    };
+
+    window.removeCard = function(id) {
+      delete constructionCards[id];
+      rebuildPerimeterUI(); renderAllConstructionCards(); updateAllInspectors();
+    };
+
+    window.updateCardField = function(id, field, value) {
+      if (constructionCards[id]) { constructionCards[id][field] = value; updateAllInspectors(); }
+    };
+
+    function renderAllConstructionCards() {
+      const cardsContainer = document.getElementById("floatingCardsContainer");
+      const linesContainer = document.getElementById("leaderLinesContainer");
+      cardsContainer.innerHTML = ""; linesContainer.innerHTML = "";
+
+      Object.keys(constructionCards).forEach(id => {
+        const card = constructionCards[id];
+        const blockEl = document.getElementById(id);
+        if (!blockEl) return;
+        
+        const cx = parseFloat(blockEl.getAttribute('data-cx')), cy = parseFloat(blockEl.getAttribute('data-cy'));
+        card.cx = cx; card.cy = cy;
+
+        let cWidth = card.isCollapsed ? 36 : CONFIG.cardW;
+        let cHeight = card.isCollapsed ? 36 : CONFIG.cardH;
+
+        let targetX = card.x + cWidth / 2;
+        let targetY = card.y + (card.isCollapsed ? 18 : 15); 
+        
+        if (cx < card.x) targetX = card.x; else if (cx > card.x + cWidth) targetX = card.x + cWidth;
+        if (cy < card.y) targetY = card.y; else if (cy > card.y + cHeight) targetY = card.y + cHeight;
+
+        let compLineClass = card.isCompleted ? "completed-line" : "";
+        let compJointClass = card.isCompleted ? "completed-joint" : "";
+
+        linesContainer.innerHTML += `<path class="leader-line ${compLineClass}" d="M ${cx} ${cy} L ${targetX} ${targetY}" /><circle class="leader-joint ${compJointClass}" cx="${cx}" cy="${cy}" r="3" />`;
+
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("id", `card-fo-${id}`);
+        g.setAttribute("transform", `translate(${card.x}, ${card.y})`);
+        
+        if (card.isCollapsed) {
+          let compClass = card.isCompleted ? "completed" : "";
+          g.innerHTML = `
+            <foreignObject width="40" height="40">
+              <div xmlns="http://www.w3.org/1999/xhtml" class="collapsed-icon drag-handle ${compClass}" title="${card.name} (點擊展開)" onclick="toggleCollapseCard('${id}')">
+                📌
+              </div>
+            </foreignObject>
+          `;
+        } else {
+          let compClass = card.isCompleted ? "completed" : "";
+          let btnText = card.isCompleted ? "✅ 解除完成狀態" : "⭕ 標記為完成";
+          g.innerHTML = `
+            <foreignObject width="${CONFIG.cardW + 10}" height="${CONFIG.cardH + 10}">
+              <div xmlns="http://www.w3.org/1999/xhtml" class="engineering-card ${compClass}" style="height: ${CONFIG.cardH}px;">
+                <div class="card-titlebar drag-handle" data-id="${id}">
+                  <span>📋 ${id}</span>
+                  <div class="card-actions">
+                    <span class="icon-btn" onclick="toggleCollapseCard('${id}')" title="收起圖框">➖</span>
+                    <span class="icon-btn icon-del" onclick="removeCard('${id}')" title="刪除">✕</span>
+                  </div>
+                </div>
+                <table class="card-grid">
+                  <tr><td class="field-label">1. 名稱</td><td><input type="text" class="field-input" value="${card.name}" oninput="updateCardField('${id}', 'name', this.value)"></td></tr>
+                  <tr><td class="field-label">2. 施作時間</td><td><input type="date" class="field-input" value="${card.time}" oninput="updateCardField('${id}', 'time', this.value)"></td></tr>
+                  <tr><td class="field-label">3. 完成時間</td><td><input type="date" class="field-input" value="${card.compTime}" oninput="updateCardField('${id}', 'compTime', this.value)"></td></tr>
+                  <tr><td class="field-label">4. 預計方數</td><td><input type="text" class="field-input" value="${card.estVol}" oninput="updateCardField('${id}', 'estVol', this.value)"></td></tr>
+                  <tr><td class="field-label">5. 實際方數</td><td><input type="text" class="field-input" value="${card.actVol}" oninput="updateCardField('${id}', 'actVol', this.value)"></td></tr>
+                  <tr><td class="field-label">6. 鋼筋頭</td><td><input type="text" class="field-input" value="${card.rebar}" oninput="updateCardField('${id}', 'rebar', this.value)"></td></tr>
+                </table>
+                <button class="btn-complete-toggle" onclick="toggleCompleteStatus('${id}')">${btnText}</button>
+              </div>
+            </foreignObject>
+          `;
+        }
+
+        const dragHandle = g.querySelector('.drag-handle');
+        if (dragHandle) {
+          dragHandle.addEventListener('mousedown', (e) => {
+            e.stopPropagation(); 
+            const svgCoords = getSVGCoords(e);
+            cardDragInfo = { id: id, offsetX: svgCoords.x - card.x, offsetY: svgCoords.y - card.y };
+          });
+        }
+        cardsContainer.appendChild(g);
+      });
+    }
+
+    function getSVGCoords(e) {
+      const svg = document.getElementById("cadSvg");
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX; pt.y = e.clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    function changeColumnQty(wall, delta) {
+      let cols = state[`${wall}Cols`], currentQty = cols.length, nextQty = currentQty + delta;
+      if (nextQty < 0) nextQty = 0; if (nextQty > 20) nextQty = 20;
+      if (nextQty === currentQty) return;
+
+      const isHorizontal = (wall === "top" || wall === "bottom");
+      const maxLen = isHorizontal ? CONFIG.cadW - CONFIG.innerOffset : CONFIG.cadH - CONFIG.innerOffset;
+      const minLen = CONFIG.innerOffset;
+      const span = maxLen - minLen - CONFIG.colSize;
+      const startBase = isHorizontal ? CONFIG.marginX : CONFIG.marginY;
+
+      let newCols = [];
+      if (nextQty > 0) {
+        if (nextQty === 1) { newCols.push(startBase + minLen + span / 2); } 
+        else {
+          let step = span / (nextQty - 1);
+          for (let i = 0; i < nextQty; i++) newCols.push(startBase + minLen + i * step);
+        }
+      }
+      state[`${wall}Cols`] = newCols;
+      document.getElementById(`lbl-qty-${wall}`).textContent = nextQty;
+      renderDynamicElements(); updateAllInspectors();
+    }
+
+    function renderDynamicElements() {
+      const container = document.getElementById("dynamicContainer");
+      container.innerHTML = "";
+
+      ["top", "bottom", "left", "right"].forEach(wall => {
+        const cols = state[`${wall}Cols`], isHorizontal = (wall === "top" || wall === "bottom");
+        const startBaseX = CONFIG.marginX, startBaseY = CONFIG.marginY;
+        
+        let trackPos = (wall === "top") ? startBaseY + CONFIG.innerOffset :
+                       (wall === "bottom") ? startBaseY + CONFIG.cadH - CONFIG.innerOffset - CONFIG.colSize :
+                       (wall === "left") ? startBaseX + CONFIG.innerOffset :
+                       startBaseX + CONFIG.cadW - CONFIG.innerOffset - CONFIG.colSize;
+
+        for (let i = 0; i <= cols.length; i++) {
+          let startVal = (i === 0) ? (isHorizontal ? startBaseX + CONFIG.innerOffset : startBaseY + CONFIG.innerOffset) : cols[i-1] + CONFIG.colSize;
+          let endVal = (i === cols.length) ? (isHorizontal ? startBaseX + CONFIG.cadW - CONFIG.innerOffset : startBaseY + CONFIG.cadH - CONFIG.innerOffset) : cols[i];
+          let dist = endVal - startVal; if (dist <= 0) continue;
+
+          let lineX1, lineY1, lineX2, lineY2, textX, textY;
+          if (isHorizontal) {
+            lineX1 = startVal; lineX2 = endVal; lineY1 = lineY2 = trackPos + CONFIG.colSize / 2; textX = startVal + dist / 2; textY = lineY1;
+          } else {
+            lineY1 = startVal; lineY2 = endVal; lineX1 = lineX2 = trackPos + CONFIG.colSize / 2; textX = lineX1; textY = startVal + dist / 2;
+          }
+
+          const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("class", "dim-line"); line.setAttribute("x1", lineX1); line.setAttribute("y1", lineY1); line.setAttribute("x2", lineX2); line.setAttribute("y2", lineY2);
+          g.appendChild(line);
+
+          const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          bg.setAttribute("class", "dim-text-bg"); bg.setAttribute("x", textX - 18); bg.setAttribute("y", textY - 8); bg.setAttribute("width", 36); bg.setAttribute("height", 16);
+          bg.addEventListener('click', () => openSpacingModal(wall, i)); g.appendChild(bg);
+
+          const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          txt.setAttribute("class", "dim-text"); txt.setAttribute("x", textX); txt.setAttribute("y", textY); txt.textContent = Math.round(dist) + " M";
+          txt.addEventListener('click', () => openSpacingModal(wall, i)); g.appendChild(txt);
+          container.appendChild(g);
+        }
+
+        cols.forEach((pos, index) => {
+          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          rect.setAttribute("class", "draggable-column"); rect.setAttribute("data-wall", wall); rect.setAttribute("data-index", index);
+          if (isHorizontal) { rect.setAttribute("x", pos); rect.setAttribute("y", trackPos); } 
+          else { rect.setAttribute("x", trackPos); rect.setAttribute("y", pos); }
+          rect.setAttribute("width", CONFIG.colSize); rect.setAttribute("height", CONFIG.colSize);
+          
+          rect.addEventListener('mousedown', (e) => {
+            e.stopPropagation(); rect.classList.add('dragging');
+            dragInfo = { wall: wall, index: index, startX: e.clientX, startY: e.clientY, initialPos: state[`${wall}Cols`][index] };
+          });
+          container.appendChild(rect);
+        });
+      });
+    }
+
+    function setupGlobalEvents() {
+      window.addEventListener('mousemove', (e) => {
+        if (dragInfo) {
+          const isHorizontal = (dragInfo.wall === "top" || dragInfo.wall === "bottom");
+          const rect = document.getElementById("cadSvg").getBoundingClientRect();
+          let delta = isHorizontal ? (e.clientX - dragInfo.startX) * (CONFIG.canvasW / rect.width) : (e.clientY - dragInfo.startY) * (CONFIG.canvasH / rect.height);
+          let newPos = dragInfo.initialPos + delta;
+          const wallCols = state[`${dragInfo.wall}Cols`];
+          const startBase = isHorizontal ? CONFIG.marginX : CONFIG.marginY;
+
+          const minLimit = (dragInfo.index === 0) ? startBase + CONFIG.innerOffset : wallCols[dragInfo.index - 1] + CONFIG.colSize + 4;
+          const maxLimit = (dragInfo.index === wallCols.length - 1) ? (startBase + (isHorizontal ? CONFIG.cadW : CONFIG.cadH) - CONFIG.innerOffset - CONFIG.colSize) : wallCols[dragInfo.index + 1] - CONFIG.colSize - 4;
+
+          if (newPos < minLimit) newPos = minLimit; if (newPos > maxLimit) newPos = maxLimit;
+          wallCols[dragInfo.index] = newPos; renderDynamicElements(); updateAllInspectors();
+        }
+
+        if (cardDragInfo) {
+          isDraggingCard = true; 
+          const coords = getSVGCoords(e);
+          let newX = coords.x - cardDragInfo.offsetX, newY = coords.y - cardDragInfo.offsetY;
+          
+          let cWidth = constructionCards[cardDragInfo.id].isCollapsed ? 40 : CONFIG.cardW;
+          let cHeight = constructionCards[cardDragInfo.id].isCollapsed ? 40 : CONFIG.cardH;
+
+          if (newX < 5) newX = 5; if (newX > CONFIG.canvasW - cWidth - 5) newX = CONFIG.canvasW - cWidth - 5;
+          if (newY < 5) newY = 5; if (newY > CONFIG.canvasH - cHeight - 5) newY = CONFIG.canvasH - cHeight - 5;
+
+          constructionCards[cardDragInfo.id].x = newX; constructionCards[cardDragInfo.id].y = newY;
+          const cardG = document.getElementById(`card-fo-${cardDragInfo.id}`);
+          if (cardG) cardG.setAttribute("transform", `translate(${newX}, ${newY})`);
+          renderAllConstructionCards();
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (dragInfo) { document.querySelectorAll('.draggable-column.dragging').forEach(el => el.classList.remove('dragging')); dragInfo = null; }
+        if (cardDragInfo) {
+          cardDragInfo = null;
+          setTimeout(() => { isDraggingCard = false; }, 50); 
+        }
+      });
+    }
+
+    function openSpacingModal(wall, index) {
+      currentModalTask = { type: 'spacing', wall: wall, index: index };
+      const cols = state[`${wall}Cols`], isHorizontal = (wall === "top" || wall === "bottom");
+      const startBase = isHorizontal ? CONFIG.marginX : CONFIG.marginY;
+      
+      let startVal = (index === 0) ? startBase + CONFIG.innerOffset : cols[index-1] + CONFIG.colSize;
+      let endVal = (index === cols.length) ? (startBase + (isHorizontal ? CONFIG.cadW : CONFIG.cadH) - CONFIG.innerOffset) : cols[index];
+      let currentDist = Math.round(endVal - startVal);
+
+      document.getElementById("modalTitle").textContent = `精確指定柱體間距 (${wall.toUpperCase()} 邊)`;
+      document.getElementById("modalLabel").textContent = `請設定第 ${index + 1} 區段的精確數值尺寸 (目前: ${currentDist} M)：`;
+      document.getElementById("paramInput").value = currentDist;
+      document.getElementById("inputModal").classList.add("active");
+    }
+
+    function closeModal() { document.getElementById("inputModal").classList.remove("active"); currentModalTask = null; }
+
+    function submitValue() {
+      if (!currentModalTask) return;
+      const val = parseFloat(document.getElementById("paramInput").value);
+      if (currentModalTask.type === 'spacing') {
+        if (isNaN(val) || val <= 0) return alert("請輸入合法正數值！");
+        applyParametricSpacing(currentModalTask.wall, currentModalTask.index, val);
+      }
+      renderDynamicElements(); updateAllInspectors(); closeModal();
+    }
+
+    function applyParametricSpacing(wall, segmentIndex, targetDistance) {
+      const cols = state[`${wall}Cols`], isHorizontal = (wall === "top" || wall === "bottom");
+      const startBase = isHorizontal ? CONFIG.marginX : CONFIG.marginY;
+      const wallMax = startBase + (isHorizontal ? CONFIG.cadW : CONFIG.cadH) - CONFIG.innerOffset;
+
+      if (segmentIndex === 0) {
+        let newX = startBase + CONFIG.innerOffset + targetDistance;
+        if (cols.length > 1 && newX >= cols[1] - CONFIG.colSize) return alert("尺寸過大，與後方結構衝突！");
+        cols[0] = newX;
+      } else if (segmentIndex === cols.length) {
+        let newX = wallMax - targetDistance - CONFIG.colSize;
+        if (cols.length > 1 && newX <= cols[cols.length - 2] + CONFIG.colSize) return alert("尺寸過小，與前方結構衝突！");
+        cols[cols.length - 1] = newX;
+      } else {
+        let newX = cols[segmentIndex - 1] + CONFIG.colSize + targetDistance;
+        if (segmentIndex < cols.length - 1 && newX >= cols[segmentIndex + 1] - CONFIG.colSize) return alert("尺寸過大，空間不足！");
+        if (newX >= wallMax - CONFIG.colSize) return alert("超出邊界上限！");
+        cols[segmentIndex] = newX;
+      }
+    }
+
+    function updateAllInspectors() {
+      const colBox = document.getElementById("columnInspector");
+      let colHtml = "";
+      ["top", "bottom", "left", "right"].forEach(wall => {
+        const cols = state[`${wall}Cols`], isHorizontal = (wall === "top" || wall === "bottom");
+        const startBase = isHorizontal ? CONFIG.marginX : CONFIG.marginY;
+        colHtml += `<div style="color:var(--cyan-accent); font-weight:bold; margin-bottom:4px; font-size:11px;">[${wall.toUpperCase()} 牆面跨距]</div>`;
+        if (cols.length === 0) { colHtml += `<div style="color:var(--text-muted); padding-left:10px; margin-bottom:8px;">無結構柱分佈</div>`; return; }
+        for (let i = 0; i <= cols.length; i++) {
+          let startVal = (i === 0) ? startBase + CONFIG.innerOffset : cols[i-1] + CONFIG.colSize;
+          let endVal = (i === cols.length) ? (startBase + (isHorizontal ? CONFIG.cadW : CONFIG.cadH) - CONFIG.innerOffset) : cols[i];
+          colHtml += `<div class="data-row"><span class="data-id">間距區段-${i+1}</span><span class="data-value">${Math.round(endVal - startVal)} M</span></div>`;
+        }
+      });
+      colBox.innerHTML = colHtml;
+
+      const periBox = document.getElementById("perimeterInspector");
+      let periHtml = ""; const keys = Object.keys(constructionCards);
+      if (keys.length === 0) {
+        periHtml = `<div style="color:var(--text-muted); text-align:center; padding:15px; font-size:12px;">點擊圖面青色外框，即可動態生成工程數據圖框</div>`;
+      } else {
+        keys.sort().forEach(k => {
+          const c = constructionCards[k];
+          let statusColor = c.isCompleted ? "#4caf50" : "#ffb300";
+          let statusText = c.isCompleted ? "(已完成)" : "";
+          periHtml += `
+            <div style="background:#161d21; border:1px solid ${c.isCompleted ? '#4caf50' : '#232d35'}; border-radius:4px; padding:8px; margin-bottom:8px; font-size:11px;">
+              <div style="display:flex; justify-content:between; border-bottom:1px solid #232d35; padding-bottom:4px; margin-bottom:4px; font-weight:bold;">
+                <span style="color:var(--cyan-accent); flex:1;">📌 區塊: ${k}</span>
+                <span style="color:${statusColor}; font-family:monospace;">${c.name || '未命名'} ${statusText}</span>
+              </div>
+              <div style="color:var(--text-main); line-height:1.5;">
+                • 施作/完成時間: <span style="color:#a6d5fa;">${c.time || '未定'} ~ ${c.compTime || '未定'}</span><br>
+                • 預計/實際方數: <span style="color:#ffb300;">${c.estVol} M³ / ${c.actVol} M³</span><br>
+                • 鋼筋頭標高: <span style="color:#ff5252; font-weight:bold;">${c.rebar}</span>
+              </div>
+            </div>`;
+        });
+      }
+      periBox.innerHTML = periHtml;
+    }
+  </script>
+</body>
+</html>
