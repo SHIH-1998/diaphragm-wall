@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html_v7_content = """<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
@@ -507,7 +507,7 @@
   <header>
     <div class="brand-section">
       <div class="logo-badge"></div>
-      <h1>CAD 參數化結構佈局與工進看板系統 (V7 修正優化版)</h1>
+      <h1>連續壁工程-公母單元</h1>
     </div>
     <div class="header-actions">
       <button class="btn-action" onclick="saveData()">💾 儲存進度</button>
@@ -585,18 +585,6 @@
   </div>
 
   <script>
-    // 💡 成功將您提供的真實 Firebase 設定值加進去了
-    const firebaseConfig = {
-      apiKey: "AIzaSyBvyCx9-15LbN_CTwgotzpDfgB69QQ5KAg",
-      authDomain: "my-cad-project-a187a.firebaseapp.com",
-      databaseURL: "https://my-cad-project-a187a-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "my-cad-project-a187a",
-      storageBucket: "my-cad-project-a187a.firebasestorage.app",
-      messagingSenderId: "960155222016",
-      appId: "1:960155222016:web:0460c794d1193d045558e5",
-      measurementId: "G-01BWX1C6NE"
-    };
-
     const CONFIG = {
       canvasW: 1660,
       canvasH: 1000,
@@ -633,8 +621,15 @@
     });
 
     function saveData() {
-      const data = { state, perimeterSegments, constructionCards };
-      localStorage.setItem('cadSystemData_v7', JSON.stringify(data));
+      const firebaseConfig = {
+  apiKey: "AIzaSyCv66pE4zBxas4QySrmeVyXXXhqbYg1llI",
+  authDomain: "diaphragm-wall-61033.firebaseapp.com",
+  projectId: "diaphragm-wall-61033",
+  storageBucket: "diaphragm-wall-61033.firebasestorage.app",
+  messagingSenderId: "245135889935",
+  appId: "1:245135889935:web:b590ed96b8ba879115b57a",
+  measurementId: "G-4LTNHYDWTG"
+};
       alert("✅ 佈局與工程參數進度已成功儲存！");
     }
 
@@ -755,8 +750,9 @@
       rebuildPerimeterUI(); renderAllConstructionCards(); updateAllInspectors();
     }
 
+    // ★ 修正點 3: 單點擊即可展開，並防止拖曳完畢後誤觸發展開
     window.toggleCollapseCard = function(id) {
-      if(isDraggingCard) return; 
+      if(isDraggingCard) return; // 如果剛剛有拖曳行為，則忽略這次的點擊
       if(constructionCards[id]) {
         constructionCards[id].isCollapsed = !constructionCards[id].isCollapsed;
         renderAllConstructionCards();
@@ -812,6 +808,7 @@
         
         if (card.isCollapsed) {
           let compClass = card.isCompleted ? "completed" : "";
+          // ★ onclick 取代 ondblclick
           g.innerHTML = `
             <foreignObject width="40" height="40">
               <div xmlns="http://www.w3.org/1999/xhtml" class="collapsed-icon drag-handle ${compClass}" title="${card.name} (點擊展開)" onclick="toggleCollapseCard('${id}')">
@@ -822,6 +819,7 @@
         } else {
           let compClass = card.isCompleted ? "completed" : "";
           let btnText = card.isCompleted ? "✅ 解除完成狀態" : "⭕ 標記為完成";
+          // 高度放大確保內容不被截斷
           g.innerHTML = `
             <foreignObject width="${CONFIG.cardW + 10}" height="${CONFIG.cardH + 10}">
               <div xmlns="http://www.w3.org/1999/xhtml" class="engineering-card ${compClass}" style="height: ${CONFIG.cardH}px;">
@@ -963,7 +961,7 @@
         }
 
         if (cardDragInfo) {
-          isDraggingCard = true; 
+          isDraggingCard = true; // ★ 標記目前正在拖曳
           const coords = getSVGCoords(e);
           let newX = coords.x - cardDragInfo.offsetX, newY = coords.y - cardDragInfo.offsetY;
           
@@ -984,6 +982,7 @@
         if (dragInfo) { document.querySelectorAll('.draggable-column.dragging').forEach(el => el.classList.remove('dragging')); dragInfo = null; }
         if (cardDragInfo) {
           cardDragInfo = null;
+          // ★ 延遲一小段時間再重置，以避免放開滑鼠時觸發了 onclick 導致直接展開
           setTimeout(() => { isDraggingCard = false; }, 50); 
         }
       });
@@ -1081,3 +1080,8 @@
   </script>
 </body>
 </html>
+"""
+
+with open("cad_construction_dashboard_v7.html", "w", encoding="utf-8") as f:
+    f.write(html_v7_content)
+print("V7 Updated Webpage generated successfully.")
